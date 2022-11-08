@@ -32,6 +32,12 @@ async function run() {
     const services = await cursor.toArray();
     res.send(services);
   });
+  app.get("/service", async (req, res) => {
+    const query = {};
+    const cursor = serviceCollection.find(query).limit(3);
+    const services = await cursor.toArray();
+    res.send(services);
+  });
 }
 run().catch((err) => console.error(err));
 app.listen(port, () => {
