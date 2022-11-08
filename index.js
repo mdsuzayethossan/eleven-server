@@ -26,6 +26,12 @@ async function run() {
     const result = await serviceCollection.insertOne(service);
     res.send(result);
   });
+  app.get("/services", async (req, res) => {
+    const query = {};
+    const cursor = serviceCollection.find(query);
+    const services = await cursor.toArray();
+    res.send(services);
+  });
 }
 run().catch((err) => console.error(err));
 app.listen(port, () => {
