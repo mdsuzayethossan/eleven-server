@@ -53,15 +53,14 @@ async function run() {
   app.patch("/review/update/:id", async (req, res) => {
     const id = req.params.id;
     const reviewtext = req.body.reviewtext;
-    console.log(reviewtext);
-    return;
     const query = { _id: ObjectId(id) };
     const updatedDoc = {
       $set: {
         reviewtext: reviewtext,
       },
     };
-    const result = await orderCollection.updateOne(query, updatedDoc);
+    const result = await reviewCollection.updateOne(query, updatedDoc);
+    console.log(result);
     res.send(result);
   });
   app.post("/add-service", async (req, res) => {
