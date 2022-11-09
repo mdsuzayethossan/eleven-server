@@ -60,7 +60,6 @@ async function run() {
       },
     };
     const result = await reviewCollection.updateOne(query, updatedDoc);
-    console.log(result);
     res.send(result);
   });
   app.post("/add-service", async (req, res) => {
