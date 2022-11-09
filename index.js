@@ -44,6 +44,18 @@ async function run() {
     const result = await reviewCollection.deleteOne(query);
     res.send(result);
   });
+  app.patch("/review/edit/:id", async (req, res) => {
+    const id = req.params.id;
+    const status = req.body.status;
+    const query = { _id: ObjectId(id) };
+    const updatedDoc = {
+      $set: {
+        status: status,
+      },
+    };
+    const result = await orderCollection.updateOne(query, updatedDoc);
+    res.send(result);
+  });
   app.post("/add-service", async (req, res) => {
     const service = req.body;
     const result = await serviceCollection.insertOne(service);
