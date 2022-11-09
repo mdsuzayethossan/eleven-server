@@ -21,6 +21,12 @@ app.get("/", (req, res) => {
 });
 async function run() {
   const serviceCollection = client.db("dentalcare").collection("services");
+  const reviewCollection = client.db("dentalcare").collection("reviews");
+  app.post("/add-review", async (req, res) => {
+    const service = req.body;
+    const result = await reviewCollection.insertOne(service);
+    res.send(result);
+  });
   app.post("/add-service", async (req, res) => {
     const service = req.body;
     const result = await serviceCollection.insertOne(service);
@@ -35,8 +41,14 @@ async function run() {
   app.get("/service", async (req, res) => {
     const query = {};
     const cursor = serviceCollection.find(query).limit(3);
-    const services = await cursor.toArray();
-    res.send(services);
+    const service = await cursor.toArray();
+    res.send(service);
+  });
+  app.get("/services/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const service = await serviceCollection.findOne(query);
+    res.send(service);
   });
 }
 run().catch((err) => console.error(err));
