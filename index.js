@@ -44,13 +44,21 @@ async function run() {
     const result = await reviewCollection.deleteOne(query);
     res.send(result);
   });
-  app.patch("/review/edit/:id", async (req, res) => {
+  app.get("/review/:id", async (req, res) => {
     const id = req.params.id;
-    const status = req.body.status;
+    const query = { _id: ObjectId(id) };
+    const result = await reviewCollection.findOne(query);
+    res.send(result);
+  });
+  app.patch("/review/update/:id", async (req, res) => {
+    const id = req.params.id;
+    const reviewtext = req.body.reviewtext;
+    console.log(reviewtext);
+    return;
     const query = { _id: ObjectId(id) };
     const updatedDoc = {
       $set: {
-        status: status,
+        reviewtext: reviewtext,
       },
     };
     const result = await orderCollection.updateOne(query, updatedDoc);
