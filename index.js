@@ -16,12 +16,31 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-app.get("/", (req, res) => {
-  res.send("Home route");
-});
+
+function verifyJwt(req, res, next) {
+  const authAccess = req.headers.authorization;
+  if (!authAccess) {
+    return res.status(401).send({ message: "Unauthorized access" });
+  }
+  const token = authAccess.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+    if (err) {
+      return res.status(401).send({ message: "Unauthorized access" });
+    }
+    req.decoded = decoded;
+    next();
+  });
+}
 async function run() {
   const serviceCollection = client.db("dentalcare").collection("services");
   const reviewCollection = client.db("dentalcare").collection("reviews");
+  app.post("/jwt", (req, res) => {
+    const user = req.body;
+    const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "10h",
+    });
+    res.send({ token });
+  });
   app.post("/add-review", async (req, res) => {
     const review = req.body;
     review.created_at = new Date();
@@ -29,7 +48,7 @@ async function run() {
     res.send(result);
   });
   //get logged user all review
-  app.get("/reviews", async (req, res) => {
+  app.get("/reviews", verifyJwt, async (req, res) => {
     let query = {};
     if (req.query.email) {
       query = {
@@ -111,6 +130,10 @@ async function run() {
   });
 }
 run().catch((err) => console.error(err));
+
+app.get("/", (req, res) => {
+  res.send("Home route");
+});
 app.listen(port, () => {
   client.connect((err) => {
     if (err) {
